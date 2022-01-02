@@ -2,6 +2,10 @@
 
 ## AWS Aurora Serverless and Data API
 
+### Class Notes
+
+There are two databases which are to be used in futute one is relational database and second is graph database. Document db are also popular but with scalability of relational and graph db will decrease the popularity of dicument db.
+
 ### Sections
 
 - [Aurora Serverless](./step38_aurora_serverless)
