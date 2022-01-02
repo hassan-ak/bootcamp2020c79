@@ -5,6 +5,15 @@
 ### Class Notes
 
 There are two databases which are to be used in futute one is relational database and second is graph database. Document db are also popular but with scalability of relational and graph db will decrease the popularity of dicument db.
+With Amazon aurora multiple master instances can be made which cause better performance. Amazon aurora have
+
+- Backtracking
+- Aurora Global database
+- Aurora Machine Learning
+- Aurora Parallel queries
+- RDS proxy
+- Aurora Serverless
+- Data API for aurora Serverless
 
 ### Sections
 
