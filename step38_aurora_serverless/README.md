@@ -1,14 +1,3 @@
-# Welcome to your CDK TypeScript project!
+# AMAZON AURORA
 
-This is a blank project for TypeScript development with CDK.
-
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+Amazon Aurora is a MySQL and PostgreSQL-compatible relational database built for the cloud, that combines the performance and availability of traditional enterprise databases with the simplicity and cost-effectiveness of open source databases. Its up to 5 times faster than standard MySQL databases and 3 times faster than standard PostgreSQL databases. It provides the security, availability, and reliability of commercial databases at 1/10th the cost and is fully managed by Amazon Relational Database Service (RDS). Amazon Aurora features a distributed, fault-tolerant, self-healing storage system that auto-scales up to 128TB per database instance. It delivers high performance and availability with up to 15 low-latency read replicas, point-in-time recovery, continuous backup to Amazon S3, and replication across three Availability Zones (AZs).
