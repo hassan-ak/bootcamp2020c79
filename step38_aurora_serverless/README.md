@@ -109,4 +109,52 @@ Aurora Serverless clusters can specify scaling properties which will be used to 
    myServerlessDB.connections.allowFromAnyIpv4(ec2.Port.tcp(3306));
    ```
 
-9.
+9. Create and navigate to new folder using `mkdir lambda` and `cd lambda` and make it a npm directory using `npm init --yes`. Isntall serverless-mysql using `npm i serverless-mysql`
+
+10. Create "lambda/index.ts" to define lambda handler code
+
+    ```js
+    import { env } from 'process';
+
+    const value = env.INSTANCE_CREDENTIALS || '';
+    const envvalue: any = JSON.parse(value);
+    const mysql = require('serverless-mysql')({
+      config: {
+        host: envvalue.host,
+        database: envvalue.dbname,
+        user: 'admin',
+        password: envvalue.password,
+      },
+    });
+
+    export async function handler(event: any, context: any) {
+      try {
+        await mysql.connect();
+        let resultsa = await mysql.query(
+          'CREATE TABLE IF NOT EXISTS new (task_id INT AUTO_INCREMENT, description TEXT, PRIMARY KEY (task_id))'
+        );
+        console.log(resultsa, 'results from database');
+        await mysql.end();
+        return {
+          statusCode: 200,
+          headers: { 'Content-Type': 'text/plain' },
+          body: `Hello, CDK! You've created ${JSON.stringify(
+            resultsa,
+            null,
+            2
+          )}\n`,
+        };
+      } catch (e) {
+        console.log(e, 'error from lambda');
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'text/plain' },
+          body: `Error creating table: ${JSON.stringify(e, null, 2)} \n`,
+        };
+      }
+    }
+    ```
+
+11. Deploy the app using `cdk deploy`
+12. Test the lambda function
+13. Destroy the app using `cdk destroy`
