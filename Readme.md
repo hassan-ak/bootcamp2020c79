@@ -4,6 +4,9 @@
 
 ### Sections
 
+- [Aurora Serverless](./step38_aurora_serverless)
+- [Aurora Serverless data API](./step39_aurora-serverless-data-api)
+
 ### Class 79 Videos
 
 - [English YouTube](https://www.youtube.com/watch?v=NC_az7syauM&ab_channel=PanacloudServerlessSaaSTraining)
