@@ -36,5 +36,77 @@ Aurora Serverless clusters can specify scaling properties which will be used to 
 - [Amazon Aurora Serverless](https://aws.amazon.com/rds/aurora/serverless/)
 - [Serverless ClusterProps](https://docs.aws.amazon.com/cdk/api/v1/docs/@aws-cdk_aws-rds.ServerlessClusterProps.html)
 - [BUILD SERVERLESS APPLICATIONS USING AURORA SERVERLESS, THE DATA API AND CDK VIDEO TUTORIAL](https://www.youtube.com/watch?v=kU8nwAbA8No&ab_channel=FooBarServerless)
+- [How to use serverless-mysql](https://github.com/jeremydaly/serverless-mysql)
 
 ## Steps to code
+
+1. Create new directory using `mkdir step38_aurora_serverless`
+2. Navigate to newly created directory using `cd step38_aurora_serverless`
+3. Create cdk app using `cdk init app --language typescript`
+4. use `npm run watch` to auto transpile the code
+5. Install ec2 module using `npm i @aws-cdk/aws-ec2`. Update "./lib/step38_aurora_serverless-stack.ts" to define virtual private cloud for the database instance.
+
+   ```js
+   import * as ec2 from '@aws-cdk/aws-ec2';
+   const vpc = new ec2.Vpc(this, 'myrdsvpc');
+   ```
+
+6. Install rds module using `npm i @aws-cdk/aws-rds`. Update "./lib/step38_aurora_serverless-stack.ts" to define a database cluster and get cluster secret
+
+   ```js
+   import * as rds from '@aws-cdk/aws-rds';
+   const myServerlessDB = new rds.ServerlessCluster(this, 'ServerlessDB', {
+     vpc,
+     engine: rds.DatabaseClusterEngine.auroraMysql({
+       version: rds.AuroraMysqlEngineVersion.VER_5_7_12,
+     }),
+     scaling: {
+       autoPause: cdk.Duration.minutes(10),
+       minCapacity: rds.AuroraCapacityUnit.ACU_8,
+       maxCapacity: rds.AuroraCapacityUnit.ACU_32,
+     },
+     deletionProtection: false,
+     defaultDatabaseName: 'mysqldb',
+   });
+   const secarn = myServerlessDB.secret?.secretArn || 'secret-arn';
+   ```
+
+7. Install iam module using `npm i @aws-cdk/aws-iam`. Update "./lib/step38_aurora_serverless-stack.ts" to define a role for lambda function so rds cluster can be assessed
+
+   ```js
+   import * as iam from '@aws-cdk/aws-iam';
+   const role = new iam.Role(this, 'LambdaRole', {
+     assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+     managedPolicies: [
+       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonRDSDataFullAccess'),
+       iam.ManagedPolicy.fromAwsManagedPolicyName(
+         'service-role/AWSLambdaVPCAccessExecutionRole'
+       ),
+     ],
+   });
+   ```
+
+8. Install lambda module using `npm i @aws-cdk/aws-lambda` and secret manager using `npm i @aws-cdk/aws-secretsmanager` Update "./lib/step38_aurora_serverless-stack.ts" to define a lambda function and define to create lambda once database is created. Also define access for cluster
+
+   ```js
+   import * as lambda from '@aws-cdk/aws-lambda';
+   const hello = new lambda.Function(this, 'HelloHandler', {
+     runtime: lambda.Runtime.NODEJS_14_X,
+     code: new lambda.AssetCode('lambda'),
+     handler: 'index.handler',
+     timeout: cdk.Duration.minutes(1),
+     vpc,
+     role,
+     environment: {
+       INSTANCE_CREDENTIALS: `${
+         SM.Secret.fromSecretAttributes(this, 'sec-arn', {
+           secretArn: secarn,
+         }).secretValue
+       }`,
+     },
+   });
+   hello.node.addDependency(myServerlessDB);
+   myServerlessDB.connections.allowFromAnyIpv4(ec2.Port.tcp(3306));
+   ```
+
+9.
